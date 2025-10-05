@@ -1,0 +1,18 @@
+.image {background-color:#999999;}
+
+.mainOutline {background-color:#ffffff;}
+
+.normal {background-color:#999999; color:#000000; font-family:verdana, arial, helvetica, sans-serif; font-size:10px; padding-bottom:5px; padding-left:5px; padding-right:5px; padding-top:5px;}
+
+.pageBackground {background-color:#666666;}
+.pageHeading {background-color:#0066cc; color:#000000; font-family:verdana, arial, helvetica, sans-serif; font-size:10px; font-weight:normal;}
+
+.result {color:#ffff00; font-family:verdana, arial, helvetica, sans-serif; font-size:20px; font-style:italic; font-weight:bold;}
+
+.topMenuBar {background-color:#000000; color:#00ff00; font-family:verdana, arial, helvetica, sans-serif; font-size:10px; font-style:italic; font-weight:bold; padding-bottom:5px; padding-left:10px; padding-right:10px; padding-top:5px;}
+
+a {color:#ffffff; text-decoration:none;}
+a:active {color:#ffffff; text-decoration:none;}
+a:hover {color:#ffffff; text-decoration:underline;}
+a:link {color:#ffffff; text-decoration:none;}
+a:visited {color:#ffffff; text-decoration:none;}
