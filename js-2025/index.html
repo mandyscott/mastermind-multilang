@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind - Modern Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .game-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .instructions-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .instructions-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .color-picker {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .picker-title {
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+        }
+
+        .color-option:active {
+            transform: scale(0.95);
+        }
+
+        .current-guess {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .guess-title {
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .guess-pegs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .guess-peg-slot {
+            width: 50px;
+            height: 50px;
+            border: 3px dashed #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .guess-peg-slot.filled {
+            border-style: solid;
+            border-color: #667eea;
+        }
+
+        .guess-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .board-title {
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .row-guess {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .row-result {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            width: 60px;
+        }
+
+        .result-peg {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+        }
+
+        .modal-text {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .win-message, .lose-message {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .win-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .lose-message {
+            background: #f44336;
+            color: white;
+        }
+
+        .message-title {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .secret-code {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .game-info {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .color-options {
+                gap: 8px;
+            }
+
+            .guess-pegs {
+                gap: 8px;
+            }
+
+            .guess-peg-slot {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Mastermind</h1>
+            <p class="subtitle">Crack the secret code!</p>
+        </header>
+
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">Guesses</div>
+                <div class="info-value" id="guessCount">0 / 16</div>
+            </div>
+            <button class="instructions-btn" onclick="showInstructions()">📖 How to Play</button>
+        </div>
+
+        <div id="gameOverMessage"></div>
+
+        <div class="color-picker">
+            <div class="picker-title">Choose a color:</div>
+            <div class="color-options" id="colorOptions"></div>
+        </div>
+
+        <div class="current-guess">
+            <div class="guess-title">Current Guess</div>
+            <div class="guess-pegs" id="currentGuess"></div>
+            <div class="guess-actions">
+                <button class="btn btn-secondary" onclick="clearGuess()">Clear</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="submitGuess()" disabled>Submit Guess</button>
+            </div>
+        </div>
+
+        <div class="board">
+            <div class="board-title">Previous Guesses</div>
+            <div id="boardRows"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="instructionsModal">
+        <div class="modal-content">
+            <h2 class="modal-title">How to Play Mastermind</h2>
+            <div class="modal-text">
+                <p><strong>Objective:</strong> Guess the secret 4-color code in 16 tries or less!</p>
+                <br>
+                <p><strong>How to Play:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Click on colors to build your guess (4 colors needed)</li>
+                    <li>Click "Submit Guess" when ready</li>
+                    <li>Use the feedback to improve your next guess</li>
+                </ul>
+                <br>
+                <p><strong>Feedback Pegs:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Black peg:</strong> Correct color in correct position</li>
+                    <li><strong>White peg:</strong> Correct color in wrong position</li>
+                    <li><strong>No peg:</strong> Color not in the code</li>
+                </ul>
+                <br>
+                <p style="color: #666; font-size: 0.9rem;">Note: Feedback pegs don't correspond to specific positions. Black pegs always appear first.</p>
+            </div>
+            <button class="modal-close" onclick="closeInstructions()">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const COLORS = ['red', 'yellow', 'green', 'blue', 'white', 'black'];
+        const CODE_LENGTH = 4;
+        const MAX_GUESSES = 16;
+
+        // Game state
+        let secretCode = [];
+        let currentGuessArray = [];
+        let guesses = [];
+        let gameOver = false;
+
+        // SVG Peg Generator
+        function createPegSVG(color, size = 40) {
+            const colors = {
+                red: '#ef4444',
+                yellow: '#fbbf24',
+                green: '#22c55e',
+                blue: '#3b82f6',
+                white: '#f3f4f6',
+                black: '#1f2937'
+            };
+
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', size);
+            svg.setAttribute('height', size);
+            svg.setAttribute('viewBox', '0 0 100 100');
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', '50');
+            circle.setAttribute('cy', '50');
+            circle.setAttribute('r', '45');
+            circle.setAttribute('fill', colors[color] || colors.black);
+            circle.setAttribute('stroke', '#333');
+            circle.setAttribute('stroke-width', '3');
+
+            const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            highlight.setAttribute('cx', '35');
+            highlight.setAttribute('cy', '35');
+            highlight.setAttribute('r', '15');
+            highlight.setAttribute('fill', 'rgba(255, 255, 255, 0.4)');
+
+            svg.appendChild(circle);
+            svg.appendChild(highlight);
+
+            return svg;
+        }
+
+        // Initialize game
+        function init() {
+            generateSecretCode();
+            renderColorOptions();
+            renderCurrentGuess();
+            updateGuessCount();
+        }
+
+        function generateSecretCode() {
+            secretCode = [];
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const randomIndex = Math.floor(Math.random() * COLORS.length);
+                secretCode.push(COLORS[randomIndex]);
+            }
+            //console.log('Secret code:', secretCode); // For debugging
+        }
+
+        function renderColorOptions() {
+            const container = document.getElementById('colorOptions');
+            container.innerHTML = '';
+            COLORS.forEach(color => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'color-option';
+                wrapper.onclick = () => addColorToGuess(color);
+                wrapper.appendChild(createPegSVG(color, 50));
+                container.appendChild(wrapper);
+            });
+        }
+
+        function renderCurrentGuess() {
+            const container = document.getElementById('currentGuess');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'guess-peg-slot';
+                
+                if (currentGuessArray[i]) {
+                    slot.classList.add('filled');
+                    slot.appendChild(createPegSVG(currentGuessArray[i], 40));
+                }
+                
+                container.appendChild(slot);
+            }
+
+            document.getElementById('submitBtn').disabled = 
+                currentGuessArray.length !== CODE_LENGTH || gameOver;
+        }
+
+        function addColorToGuess(color) {
+            if (gameOver) return;
+            if (currentGuessArray.length < CODE_LENGTH) {
+                currentGuessArray.push(color);
+                renderCurrentGuess();
+            }
+        }
+
+        function clearGuess() {
+            currentGuessArray = [];
+            renderCurrentGuess();
+        }
+
+        function submitGuess() {
+            if (currentGuessArray.length !== CODE_LENGTH || gameOver) return;
+
+            const result = calculateResult(currentGuessArray, secretCode);
+            guesses.unshift({ guess: [...currentGuessArray], result });
+            
+            renderBoard();
+            updateGuessCount();
+            
+            // Check win/lose conditions
+            if (result.black === CODE_LENGTH) {
+                endGame(true);
+            } else if (guesses.length >= MAX_GUESSES) {
+                endGame(false);
+            }
+            
+            clearGuess();
+        }
+
+        function calculateResult(guess, secret) {
+            const result = { black: 0, white: 0 };
+            const secretCopy = [...secret];
+            const guessCopy = [...guess];
+
+            // Check for black pegs (correct position)
+            for (let i = CODE_LENGTH - 1; i >= 0; i--) {
+                if (guessCopy[i] === secretCopy[i]) {
+                    result.black++;
+                    secretCopy.splice(i, 1);
+                    guessCopy.splice(i, 1);
+                }
+            }
+
+            // Check for white pegs (correct color, wrong position)
+            for (let i = guessCopy.length - 1; i >= 0; i--) {
+                const index = secretCopy.indexOf(guessCopy[i]);
+                if (index !== -1) {
+                    result.white++;
+                    secretCopy.splice(index, 1);
+                }
+            }
+
+            return result;
+        }
+
+        function renderBoard() {
+            const container = document.getElementById('boardRows');
+            container.innerHTML = '';
+
+            guesses.forEach(({ guess, result }) => {
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                const guessDiv = document.createElement('div');
+                guessDiv.className = 'row-guess';
+                guess.forEach(color => {
+                    guessDiv.appendChild(createPegSVG(color, 35));
+                });
+
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'row-result';
+                for (let i = 0; i < result.black; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'result-peg';
+                    peg.style.background = '#1f2937';
+                    resultDiv.appendChild(peg);
+                }
+                for (let i = 0; i < result.white; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'result-peg';
+                    peg.style.background = '#f3f4f6';
+                    peg.style.border = '1px solid #999';
+                    resultDiv.appendChild(peg);
+                }
+
+                row.appendChild(guessDiv);
+                row.appendChild(resultDiv);
+                container.appendChild(row);
+            });
+        }
+
+        function updateGuessCount() {
+            document.getElementById('guessCount').textContent = 
+                `${guesses.length} / ${MAX_GUESSES}`;
+        }
+
+        function endGame(won) {
+            gameOver = true;
+            document.getElementById('submitBtn').disabled = true;
+
+            const messageContainer = document.getElementById('gameOverMessage');
+            
+            if (won) {
+                messageContainer.innerHTML = `
+                    <div class="win-message">
+                        <div class="message-title">🎉 Congratulations!</div>
+                        <p>You cracked the code in ${guesses.length} guess${guesses.length === 1 ? '' : 'es'}!</p>
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="location.reload()">Play Again</button>
+                    </div>
+                `;
+            } else {
+                const secretDiv = document.createElement('div');
+                secretDiv.className = 'secret-code';
+                secretCode.forEach(color => {
+                    secretDiv.appendChild(createPegSVG(color, 40));
+                });
+
+                messageContainer.innerHTML = `
+                    <div class="lose-message">
+                        <div class="message-title">Game Over!</div>
+                        <p>The secret code was:</p>
+                    </div>
+                `;
+                messageContainer.querySelector('.lose-message').appendChild(secretDiv);
+                messageContainer.innerHTML += `
+                    <div class="lose-message">
+                        <button class="btn btn-primary" style="margin-top: 16px; background: white; color: #f44336;" onclick="location.reload()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function showInstructions() {
+            document.getElementById('instructionsModal').classList.add('active');
+        }
+
+        function closeInstructions() {
+            document.getElementById('instructionsModal').classList.remove('active');
+        }
+
+        // Start the game
+        init();
+    </script>
+</body>
+</html>
